@@ -3,6 +3,46 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "dashboard_bg",
+      "value": "#1A1A2E"
+    },
+    {
+      "name": "ring_active",
+      "value": "#00D4FF"
+    },
+    {
+      "name": "ring_track",
+      "value": "#2A2A4E"
+    },
+    {
+      "name": "tile_bg",
+      "value": "#16213E"
+    },
+    {
+      "name": "accent_green",
+      "value": "#00FF94"
+    },
+    {
+      "name": "accent_red",
+      "value": "#FF4757"
+    },
+    {
+      "name": "text_primary",
+      "value": "#E8E8F0"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#8888AA"
+    },
+    {
+      "name": "wifi_color",
+      "value": "#00D4FF"
+    },
+    {
+      "name": "mobile_color",
+      "value": "#FF6B6B"
     }
   ]
 }

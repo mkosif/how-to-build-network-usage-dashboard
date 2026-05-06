@@ -1,8 +1,24 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { storageService } from '../services/StorageService';
+import { UsageSnapshot, DailyUsageSummary } from '../models/NetworkModel';
 
 const DOMAIN = 0x0000;
+
+function todayDateString(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isWifi(ifaceName: string): boolean {
+  return ifaceName.toLowerCase().startsWith('wlan') ||
+    ifaceName.toLowerCase().startsWith('wifi') ||
+    ifaceName.toLowerCase().startsWith('eth');
+}
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -12,6 +28,9 @@ export default class EntryAbility extends UIAbility {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+
+    // Store context in AppStorage so pages can access it for StorageService init
+    AppStorage.setOrCreate('abilityContext', this.context);
   }
 
   onDestroy(): void {
@@ -19,8 +38,12 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    // Initialise storage service with the ability context
+    storageService.init(this.context).then(() => {
+      hilog.info(DOMAIN, 'testTag', 'StorageService initialized in onWindowStageCreate');
+    });
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
@@ -32,17 +55,38 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageDestroy(): void {
-    // Main window is destroyed, release UI related resources
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
-    // Ability has brought to foreground
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
-    // Ability has back to background
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+
+    // Append today's usage snapshot to history
+    try {
+      const snapshot = AppStorage.get<UsageSnapshot>('netSnapshot');
+      if (snapshot && snapshot.records.length > 0) {
+        const totalBytes = snapshot.records.reduce((acc, r) => acc + r.totalBytes, 0);
+        const wifiBytes = snapshot.records
+          .filter(r => isWifi(r.ifaceName))
+          .reduce((acc, r) => acc + r.totalBytes, 0);
+
+        const record: DailyUsageSummary = {
+          date: todayDateString(),
+          totalBytes,
+          wifiBytes,
+          mobileBytes: totalBytes - wifiBytes
+        };
+
+        storageService.appendDailyRecord(record).then(() => {
+          hilog.info(DOMAIN, 'testTag', 'Daily usage record appended on background: %{public}s', record.date);
+        });
+      }
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to append daily record on background: %{public}s', JSON.stringify(err));
+    }
   }
 }

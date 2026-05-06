@@ -45,6 +45,11 @@
           }
         ],
       }
+    ],
+    "requestPermissions": [
+      { "name": "ohos.permission.GET_NETWORK_INFO" },
+      { "name": "ohos.permission.INTERNET" },
+      { "name": "ohos.permission.MANAGE_NET_STRATEGY" }
     ]
   }
 }

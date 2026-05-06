@@ -3,6 +3,38 @@
     {
       "name": "page_text_font_size",
       "value": "50fp"
+    },
+    {
+      "name": "ring_size",
+      "value": "120vp"
+    },
+    {
+      "name": "tile_height",
+      "value": "56vp"
+    },
+    {
+      "name": "tile_width",
+      "value": "100vp"
+    },
+    {
+      "name": "small_font",
+      "value": "12fp"
+    },
+    {
+      "name": "medium_font",
+      "value": "16fp"
+    },
+    {
+      "name": "large_font",
+      "value": "22fp"
+    },
+    {
+      "name": "icon_size",
+      "value": "20vp"
+    },
+    {
+      "name": "row_height",
+      "value": "48vp"
     }
   ]
 }

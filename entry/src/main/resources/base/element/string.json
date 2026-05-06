@@ -11,6 +11,70 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "app_name",
+      "value": "Net Dashboard"
+    },
+    {
+      "name": "dashboard_title",
+      "value": "Network Usage"
+    },
+    {
+      "name": "detail_title",
+      "value": "Interfaces"
+    },
+    {
+      "name": "history_title",
+      "value": "History"
+    },
+    {
+      "name": "settings_title",
+      "value": "Settings"
+    },
+    {
+      "name": "unit_mb",
+      "value": "MB"
+    },
+    {
+      "name": "unit_kb",
+      "value": "KB"
+    },
+    {
+      "name": "label_wifi",
+      "value": "Wi-Fi"
+    },
+    {
+      "name": "label_mobile",
+      "value": "Mobile"
+    },
+    {
+      "name": "label_today",
+      "value": "Today"
+    },
+    {
+      "name": "label_sent",
+      "value": "Sent"
+    },
+    {
+      "name": "label_received",
+      "value": "Received"
+    },
+    {
+      "name": "label_limit",
+      "value": "Daily Limit"
+    },
+    {
+      "name": "label_reset_history",
+      "value": "Reset History"
+    },
+    {
+      "name": "alert_over_limit",
+      "value": "Limit Exceeded"
+    },
+    {
+      "name": "no_data",
+      "value": "No data yet"
     }
   ]
 }
