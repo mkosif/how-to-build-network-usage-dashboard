@@ -9,7 +9,7 @@ export struct InterfaceRowComponent {
 
   build() {
     Row({ space: 6 }) {
-      Text(this.ifaceName)
+      Text(this.ifaceName === 'all' ? 'All' : (this.ifaceName === 'app' ? 'App UID' : this.ifaceName))
         .fontSize(13)
         .fontColor('#E8E8F0')
         .fontWeight(FontWeight.Medium)

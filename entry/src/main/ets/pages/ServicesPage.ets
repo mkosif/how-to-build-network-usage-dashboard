@@ -136,28 +136,21 @@ export struct ServicesPage {
 
   build() {
     Column({ space: 0 }) {
-      Text('Local Services')
-        .fontSize(16)
-        .fontWeight(FontWeight.Bold)
-        .fontColor('#E8E8F0')
-        .width('100%')
-        .textAlign(TextAlign.Center)
-        .padding({ top: 12, bottom: 4 })
-
       Row({ space: 6 }) {
+        Text('Local Services')
+          .fontSize(15)
+          .fontWeight(FontWeight.Bold)
+          .fontColor('#E8E8F0')
         if (this.isDiscovering) {
           LoadingProgress()
-            .width(14)
-            .height(14)
+            .width(12)
+            .height(12)
             .color('#00D4FF')
         }
-        Text(this.isDiscovering ? 'Discovering...' : 'Stopped')
-          .fontSize(10)
-          .fontColor(this.isDiscovering ? '#00D4FF' : '#8888AA')
       }
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .padding({ bottom: 6 })
+      .padding({ top: 10, bottom: 6 })
 
       if (this.hasError) {
         Column() {
@@ -170,21 +163,22 @@ export struct ServicesPage {
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
+        .padding({ bottom: 24 })
       } else if (this.services.length === 0) {
-        Column() {
-          Text('No services found yet')
+        Column({ space: 4 }) {
+          Text('No local services')
             .fontSize(13)
             .fontColor('#8888AA')
             .textAlign(TextAlign.Center)
-          Text('Searching for _http._tcp and _https._tcp')
+          Text('HTTP services not found')
             .fontSize(10)
             .fontColor('#555577')
             .textAlign(TextAlign.Center)
-            .padding({ top: 4, left: 16, right: 16 })
         }
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
+        .padding({ bottom: 24 })
       } else {
         Column() {
           ArcList() {
@@ -217,6 +211,7 @@ export struct ServicesPage {
         }
         .width('100%')
         .layoutWeight(1)
+        .padding({ bottom: 24 })
       }
     }
     .width('100%')

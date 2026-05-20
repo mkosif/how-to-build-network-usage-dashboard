@@ -40,6 +40,9 @@ export struct HistoryPage {
     };
 
     const stored = this.historyRecords.filter(r => r.date !== todayDateString());
+    if (todayEntry.totalBytes <= 0) {
+      return stored.slice(0, 7);
+    }
     return [todayEntry, ...stored].slice(0, 7);
   }
 
@@ -52,12 +55,12 @@ export struct HistoryPage {
   build() {
     Column({ space: 0 }) {
       Text($r('app.string.history_title'))
-        .fontSize(16)
+        .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor('#E8E8F0')
         .width('100%')
         .textAlign(TextAlign.Center)
-        .padding({ top: 12, bottom: 8 })
+        .padding({ top: 10, bottom: 6 })
 
       if (this.isLoading) {
         Column() {
@@ -69,10 +72,9 @@ export struct HistoryPage {
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
-      } else if (this.historySource.totalCount() === 0 ||
-        this.historySource.getData(0).totalBytes === 0) {
+      } else if (this.historySource.totalCount() === 0) {
         Column() {
-          Text($r('app.string.no_data'))
+          Text('No saved usage')
             .fontSize(13)
             .fontColor('#8888AA')
             .textAlign(TextAlign.Center)
@@ -80,6 +82,7 @@ export struct HistoryPage {
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
+        .padding({ bottom: 24 })
       } else {
         Column() {
           ArcList() {
@@ -116,6 +119,7 @@ export struct HistoryPage {
         }
         .width('100%')
         .layoutWeight(1)
+        .padding({ bottom: 24 })
       }
     }
     .width('100%')

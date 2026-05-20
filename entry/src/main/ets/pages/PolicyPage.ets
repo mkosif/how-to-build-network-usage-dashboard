@@ -1,26 +1,14 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { connection } from '@kit.NetworkKit';
-import { ArcList, ArcListItem, ComponentContent } from '@kit.ArkUI';
-import { BasicDataSource } from '../utils/BasicDataSource';
 
 const DOMAIN = 0x0002;
-const TAG = 'PolicyPage';
-const POLICY_COUNT_KEY = 'netPolicyCount';
+const TAG = 'ConnectionPage';
+const STATUS_COUNT_KEY = 'netStatusCount';
 
 export interface NetworkCapEntry {
   label: string;
   value: string;
   highlight: boolean;
-}
-
-@Builder
-function PolicyHeaderBuilder() {
-  Text('Network Policy')
-    .fontSize(16)
-    .fontWeight(FontWeight.Bold)
-    .fontColor('#E8E8F0')
-    .textAlign(TextAlign.Center)
-    .width('100%')
 }
 
 @Component
@@ -29,21 +17,13 @@ export struct PolicyPage {
   @State hasError: boolean = false;
   @State errorMsg: string = '';
   @State isMetered: boolean = false;
-  @State @Watch('onEntriesChange') capEntries: NetworkCapEntry[] = [];
-  private capSource: BasicDataSource<NetworkCapEntry> = new BasicDataSource<NetworkCapEntry>([]);
-  private context: UIContext = this.getUIContext();
-  private header: ComponentContent<Object> = new ComponentContent(this.context, wrapBuilder(PolicyHeaderBuilder));
+  @State capEntries: NetworkCapEntry[] = [];
 
   aboutToAppear(): void {
-    this.loadNetworkPolicy();
+    this.loadConnectionStatus();
   }
 
-  onEntriesChange(): void {
-    this.capSource.setData(this.capEntries);
-    this.capSource.notifyDataReload();
-  }
-
-  private loadNetworkPolicy(): void {
+  private loadConnectionStatus(): void {
     this.isLoading = true;
     this.hasError = false;
 
@@ -101,33 +81,41 @@ export struct PolicyPage {
         }
 
         entries.push({
-          label: 'Policy',
-          value: notMetered ? 'Unrestricted' : (this.isMetered ? 'Metered' : 'Standard'),
+          label: 'Cost',
+          value: notMetered ? 'Unmetered' : (this.isMetered ? 'Metered' : 'Standard'),
           highlight: this.isMetered && !notMetered
         });
 
         this.capEntries = entries;
-        AppStorage.setOrCreate<number>(POLICY_COUNT_KEY, entries.length);
+        AppStorage.setOrCreate<number>(STATUS_COUNT_KEY, entries.length);
         this.isLoading = false;
-        hilog.info(DOMAIN, TAG, 'Network policy loaded: metered=%{public}s bearers=%{public}s',
+        hilog.info(DOMAIN, TAG, 'Connection status loaded: metered=%{public}s bearers=%{public}s',
           this.isMetered.toString(), bearerLabels.join(','));
       })
       .catch((err: Error) => {
-        hilog.error(DOMAIN, TAG, 'loadNetworkPolicy failed: %{public}s', JSON.stringify(err));
+        hilog.error(DOMAIN, TAG, 'loadConnectionStatus failed: %{public}s', JSON.stringify(err));
         this.hasError = true;
-        this.errorMsg = 'Cannot read network capabilities';
+        this.errorMsg = 'Cannot read connection status';
         this.isLoading = false;
-        AppStorage.setOrCreate<number>(POLICY_COUNT_KEY, 0);
+        AppStorage.setOrCreate<number>(STATUS_COUNT_KEY, 0);
       });
   }
 
   build() {
     Column({ space: 0 }) {
+      Text('Connection')
+        .fontSize(15)
+        .fontWeight(FontWeight.Bold)
+        .fontColor('#E8E8F0')
+        .width('100%')
+        .textAlign(TextAlign.Center)
+        .padding({ top: 10, bottom: 6 })
+
       if (this.isLoading) {
         Column({ space: 6 }) {
           LoadingProgress()
-            .width(32)
-            .height(32)
+            .width(28)
+            .height(28)
             .color('#00D4FF')
           Text('Loading...')
             .fontSize(11)
@@ -143,59 +131,64 @@ export struct PolicyPage {
             .fontColor('#FF4757')
             .textAlign(TextAlign.Center)
             .padding({ left: 16, right: 16 })
-          Button('Retry')
-            .fontSize(12)
-            .height(32)
-            .backgroundColor('#2A2A4E')
-            .fontColor('#00D4FF')
-            .onClick(() => {
-              this.loadNetworkPolicy();
-            })
+          Column() {
+            Text('Retry')
+              .fontSize(12)
+              .fontColor('#00D4FF')
+              .textAlign(TextAlign.Center)
+          }
+          .width(64)
+          .height(28)
+          .borderRadius(14)
+          .backgroundColor('#2A2A4E')
+          .justifyContent(FlexAlign.Center)
+          .onClick(() => {
+            this.loadConnectionStatus();
+          })
         }
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        Column() {
-          ArcList({ header: this.header }) {
-            LazyForEach(this.capSource, (entry: NetworkCapEntry) => {
-              ArcListItem() {
-                Row() {
-                  Text(entry.label)
-                    .fontSize(11)
-                    .fontColor('#8888AA')
-                    .textAlign(TextAlign.Start)
-                  Text(entry.value)
-                    .fontSize(12)
-                    .textAlign(TextAlign.End)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(entry.highlight ? '#FF6B6B' : '#E8E8F0')
-                }
-                .width('100%')
-                .alignItems(VerticalAlign.Center)
-                .justifyContent(FlexAlign.SpaceEvenly)
-                .padding({
-                  left: 16,
-                  right: 16,
-                  top: 8,
-                  bottom: 8
-                })
+        Scroll() {
+          Column({ space: 0 }) {
+            ForEach(this.capEntries, (entry: NetworkCapEntry) => {
+              Row() {
+                Text(entry.label)
+                  .fontSize(11)
+                  .fontColor('#8888AA')
+                  .textAlign(TextAlign.Start)
+                  .layoutWeight(1)
+                Text(entry.value)
+                  .fontSize(12)
+                  .textAlign(TextAlign.End)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(entry.highlight ? '#FF6B6B' : '#E8E8F0')
+                  .layoutWeight(1)
               }
+              .width('100%')
+              .alignItems(VerticalAlign.Center)
+              .padding({ left: 20, right: 20, top: 7, bottom: 7 })
             }, (entry: NetworkCapEntry) => entry.label)
 
-            ArcListItem() {
-              Button('Refresh')
+            Column() {
+              Text('Refresh')
                 .fontSize(11)
-                .height(32)
-                .width('80%')
-                .backgroundColor('#2A2A4E')
                 .fontColor('#8888AA')
-                .onClick(() => {
-                  this.loadNetworkPolicy();
-                })
-                .margin({ bottom: 8 })
+                .textAlign(TextAlign.Center)
             }
+            .width(64)
+            .height(26)
+            .borderRadius(13)
+            .backgroundColor('#2A2A4E')
+            .justifyContent(FlexAlign.Center)
+            .margin({ top: 6, bottom: 28 })
+            .onClick(() => {
+              this.loadConnectionStatus();
+            })
           }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
         }
         .width('100%')
         .layoutWeight(1)

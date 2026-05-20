@@ -44,20 +44,20 @@ NaGPTvqEbOAqI2bCKaX8HNn7DVN3HGxnqKG7j5Wbm8fFiSk7mA==
 @Builder
 function HeaderBuilder() {
   Column({ space: 0 }) {
-    Text('Trust Store Check')
+    Text('Certificate Check')
       .fontSize(14)
       .fontWeight(FontWeight.Bold)
       .fontColor('#E8E8F0')
       .width('100%')
       .textAlign(TextAlign.Center)
-      .padding({ top: 12, bottom: 4 })
+      .padding({ top: 10, bottom: 4 })
 
     Text('ISRG Root X1')
       .fontSize(10)
       .fontColor('#8888AA')
       .width('100%')
       .textAlign(TextAlign.Center)
-      .padding({ bottom: 6 })
+      .padding({ bottom: 4 })
   }
 }
 
@@ -113,10 +113,18 @@ export struct SecurityPage {
       .catch((err: BusinessError) => {
         this.checkedAt = Date.now();
         const code = err.code ?? -1;
-        if (code >= 2305001 && code <= 2305099) {
-          this.certStatus = `Untrusted (${code})`;
+        if (code === 2305027) {
+          this.certStatus = 'Untrusted';
           this.certColor = '#FF4757';
           AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Untrusted');
+        } else if (code === 2305069) {
+          this.certStatus = 'Invalid Context';
+          this.certColor = '#FFB347';
+          AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Invalid Context');
+        } else if (code >= 2305001 && code <= 2305099) {
+          this.certStatus = `Cert Error (${code})`;
+          this.certColor = '#FF4757';
+          AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Cert Error');
         } else {
           this.certStatus = `Error (${code})`;
           this.certColor = '#FFB347';
@@ -148,15 +156,17 @@ export struct SecurityPage {
         Column() {
           ArcList({ header: this.header }) {
             ArcListItem() {
-              Column({ space: 6 }) {
+              Column({ space: 4 }) {
                 Row({ space: 8 }) {
                   Text('Cert Status:')
-                    .fontSize(12)
+                    .fontSize(11)
                     .fontColor('#8888AA')
                   Text(this.certStatus)
-                    .fontSize(13)
+                    .fontSize(12)
                     .fontWeight(FontWeight.Bold)
                     .fontColor(this.certColor)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
                 .justifyContent(FlexAlign.Center)
                 .alignItems(VerticalAlign.Center)
@@ -170,20 +180,20 @@ export struct SecurityPage {
               .padding({
                 left: 16,
                 right: 16,
-                top: 10,
-                bottom: 8
+                top: 8,
+                bottom: 6
               })
             }
 
             ArcListItem() {
-              Column({ space: 4 }) {
+              Column({ space: 3 }) {
                 Row() {
                   Text('Cleartext (all):')
-                    .fontSize(11)
+                    .fontSize(10)
                     .fontColor('#8888AA')
                     .layoutWeight(1)
                   Text(this.cleartextAllowed ? 'Allowed' : 'Blocked')
-                    .fontSize(11)
+                    .fontSize(10)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(this.cleartextAllowed ? '#FFB347' : '#00FF88')
                 }
@@ -191,11 +201,11 @@ export struct SecurityPage {
 
                 Row() {
                   Text('Cleartext (host):')
-                    .fontSize(11)
+                    .fontSize(10)
                     .fontColor('#8888AA')
                     .layoutWeight(1)
                   Text(this.hostCleartextAllowed ? 'Allowed' : 'Blocked')
-                    .fontSize(11)
+                    .fontSize(10)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(this.hostCleartextAllowed ? '#FFB347' : '#00FF88')
                 }
@@ -204,23 +214,23 @@ export struct SecurityPage {
               .padding({
                 left: 16,
                 right: 16,
-                top: 8,
-                bottom: 8
+                top: 6,
+                bottom: 6
               })
             }
 
             ArcListItem() {
               Button('Refresh')
-                .fontSize(12)
-                .height(32)
-                .width('80%')
+                .fontSize(11)
+                .height(28)
+                .width('70%')
                 .backgroundColor('#2A2A4E')
                 .fontColor('#00D4FF')
                 .onClick(() => {
                   this.loadCleartextPolicy();
                   this.checkCertificate();
                 })
-                .margin({ top: 4, bottom: 8 })
+                .margin({ top: 2, bottom: 28 })
             }
           }
         }

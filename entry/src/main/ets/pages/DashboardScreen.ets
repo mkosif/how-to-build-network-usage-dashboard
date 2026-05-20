@@ -39,7 +39,7 @@ export struct DashboardScreen {
   private wifiMB(): number {
     return bytesToMB(
       this.snapshot.records
-        .filter(r => isWifi(r.ifaceName))
+        .filter(r => r.ifaceName !== 'all' && r.ifaceName !== 'app' && isWifi(r.ifaceName))
         .reduce((acc, r) => acc + r.totalBytes, 0)
     );
   }
@@ -47,9 +47,17 @@ export struct DashboardScreen {
   private mobileMB(): number {
     return bytesToMB(
       this.snapshot.records
-        .filter(r => !isWifi(r.ifaceName))
+        .filter(r => r.ifaceName !== 'all' && r.ifaceName !== 'app' && !isWifi(r.ifaceName))
         .reduce((acc, r) => acc + r.totalBytes, 0)
     );
+  }
+
+  private canShowBearerSplit(): boolean {
+    return !this.hasError && this.snapshot.records.every(r => r.ifaceName !== 'all' && r.ifaceName !== 'app');
+  }
+
+  private observedLabel(): string {
+    return this.snapshot.records.some(r => r.ifaceName === 'app') ? 'App UID' : 'Observed';
   }
 
   private isOverLimit(): boolean {
@@ -59,7 +67,7 @@ export struct DashboardScreen {
   build() {
     Column({ space: 0 }) {
       AlertBannerComponent({
-        visible: this.isOverLimit(),
+        visible: this.isOverLimit() && !this.hasError,
         message: $r('app.string.alert_over_limit')
       })
 
@@ -76,20 +84,27 @@ export struct DashboardScreen {
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
-      } else if (this.hasError) {
-        Column() {
-          Text('Unable to read network stats')
-            .fontSize(12)
-            .fontColor('#FF4757')
-            .textAlign(TextAlign.Center)
-            .padding({ left: 16, right: 16 })
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Center)
       } else {
         Column() {
           ArcList({ header: this.header }) {
+            if (this.hasError) {
+              ArcListItem() {
+                Column({ space: 2 }) {
+                  Text('Stats unavailable')
+                    .fontSize(11)
+                    .fontColor('#FFB347')
+                    .textAlign(TextAlign.Center)
+                    .width('100%')
+                  Text('Permission or emulator limit')
+                    .fontSize(9)
+                    .fontColor('#555577')
+                    .textAlign(TextAlign.Center)
+                    .width('100%')
+                }
+                .padding({ top: 2, bottom: 2 })
+              }
+            }
+
             ArcListItem() {
               Column({ space: 4 }) {
 
@@ -106,16 +121,29 @@ export struct DashboardScreen {
 
             ArcListItem() {
               Row({ space: 8 }) {
-                MetricTileComponent({
-                  label: 'Wi-Fi',
-                  value: `${this.wifiMB().toFixed(1)} MB`,
-                  accentColor: '#00D4FF'
-                })
-                MetricTileComponent({
-                  label: 'Mobile',
-                  value: `${this.mobileMB().toFixed(1)} MB`,
-                  accentColor: '#FF6B6B'
-                })
+                if (this.canShowBearerSplit()) {
+                  MetricTileComponent({
+                    label: 'Wi-Fi',
+                    value: `${this.wifiMB().toFixed(1)} MB`,
+                    accentColor: '#00D4FF'
+                  })
+                  MetricTileComponent({
+                    label: 'Mobile',
+                    value: `${this.mobileMB().toFixed(1)} MB`,
+                    accentColor: '#FF6B6B'
+                  })
+                } else {
+                  MetricTileComponent({
+                    label: this.observedLabel(),
+                    value: `${this.totalMB().toFixed(1)} MB`,
+                    accentColor: '#00D4FF'
+                  })
+                  MetricTileComponent({
+                    label: 'Split',
+                    value: '--',
+                    accentColor: '#8888AA'
+                  })
+                }
               }
               .width('100%')
               .justifyContent(FlexAlign.Center)

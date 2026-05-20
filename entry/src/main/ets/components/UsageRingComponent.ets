@@ -4,7 +4,7 @@ export struct UsageRingComponent {
   @Prop limitMB: number = 500;
   @Prop label: string = 'MB';
 
-  private ringSize: number = 120;
+  private ringSize: number = 96;
 
   private get ratio(): number {
     if (this.limitMB <= 0) {
@@ -29,7 +29,7 @@ export struct UsageRingComponent {
         .width(this.ringSize)
         .height(this.ringSize)
         .style({
-          strokeWidth: 10,
+          strokeWidth: 8,
           enableScanEffect: false
         })
         .color(this.ringColor)
@@ -37,11 +37,11 @@ export struct UsageRingComponent {
 
       Column() {
         Text(this.usedMB.toFixed(1))
-          .fontSize(20)
+          .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor('#E8E8F0')
         Text(this.label)
-          .fontSize(11)
+          .fontSize(10)
           .fontColor('#8888AA')
       }
     }

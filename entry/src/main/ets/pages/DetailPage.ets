@@ -9,6 +9,7 @@ export struct DetailPage {
   @StorageProp('netSnapshot') @Watch('onSnapshotChange') snapshot: UsageSnapshot =
     { records: [], capturedAt: 0 };
   @StorageProp('netSnapshotReady') isReady: boolean = false;
+  @StorageProp('netSnapshotError') hasError: boolean = false;
   private recordSource: BasicDataSource<InterfaceUsageRecord> =
     new BasicDataSource<InterfaceUsageRecord>([]);
 
@@ -24,23 +25,51 @@ export struct DetailPage {
   build() {
     Column({ space: 0 }) {
       Text($r('app.string.detail_title'))
-        .fontSize(16)
+        .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor('#E8E8F0')
         .width('100%')
         .textAlign(TextAlign.Center)
-        .padding({ top: 12, bottom: 8 })
+        .padding({ top: 10, bottom: 2 })
 
-      if (!this.isReady || this.snapshot.records.length === 0) {
+      if (this.snapshot.capturedAt > 0) {
+        Text(`Updated: ${formattedTime(this.snapshot.capturedAt)}`)
+          .fontSize(9)
+          .fontColor('#555577')
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .padding({ bottom: 4 })
+      }
+
+      if (!this.isReady && !this.hasError) {
         Column() {
-          Text($r('app.string.no_data'))
-            .fontSize(13)
-            .fontColor('#8888AA')
-            .textAlign(TextAlign.Center)
+          LoadingProgress()
+            .width(32)
+            .height(32)
+            .color('#00D4FF')
         }
         .width('100%')
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
+      } else if ((this.isReady || this.hasError) && this.snapshot.records.length === 0) {
+        Column({ space: 6 }) {
+          Text(this.hasError ? 'Network stats unavailable' : $r('app.string.no_data'))
+            .fontSize(13)
+            .fontColor(this.hasError ? '#FF4757' : '#8888AA')
+            .textAlign(TextAlign.Center)
+            .padding({ left: 16, right: 16 })
+          if (this.hasError) {
+            Text('GET_NETWORK_STATS not granted')
+              .fontSize(10)
+              .fontColor('#555577')
+              .textAlign(TextAlign.Center)
+              .padding({ left: 16, right: 16 })
+          }
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .padding({ bottom: 24 })
       } else {
         Column() {
           ArcList() {
@@ -58,14 +87,8 @@ export struct DetailPage {
         }
         .width('100%')
         .layoutWeight(1)
+        .padding({ bottom: 24 })
       }
-
-      Text(`Updated: ${formattedTime(this.snapshot.capturedAt)}`)
-        .fontSize(10)
-        .fontColor('#8888AA')
-        .textAlign(TextAlign.Center)
-        .width('100%')
-        .padding({ bottom: 8 })
     }
     .width('100%')
     .height('100%')

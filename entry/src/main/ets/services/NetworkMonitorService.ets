@@ -1,6 +1,7 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { statistics } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import process from '@ohos.process';
 import { InterfaceUsageRecord, UsageSnapshot } from '../models/NetworkModel';
 import { alertService } from './AlertService';
 import { storageService } from './StorageService';
@@ -57,7 +58,8 @@ class NetworkMonitorService {
     hilog.info(DOMAIN, TAG, 'Polling network stats');
     this.fetchIfaceStats()
       .then((snapshot: UsageSnapshot) => {
-        this.publishSnapshot(snapshot, false);
+        const allFailed = snapshot.records.length === 0;
+        this.publishSnapshot(snapshot, allFailed);
       })
       .catch((err: BusinessError) => {
         hilog.error(DOMAIN, TAG, 'Poll failed: %{public}s', JSON.stringify(err));
@@ -74,19 +76,54 @@ class NetworkMonitorService {
       try {
         const rxBytes: number = await statistics.getIfaceRxBytes(iface);
         const txBytes: number = await statistics.getIfaceTxBytes(iface);
-        if (rxBytes > 0 || txBytes > 0) {
-          records.push({
-            ifaceName: iface,
-            txBytes,
-            rxBytes,
-            totalBytes: txBytes + rxBytes,
-            timestamp: now
-          });
-          hilog.info(DOMAIN, TAG, 'iface=%{public}s rx=%{public}d tx=%{public}d', iface, rxBytes, txBytes);
-        }
+        records.push({
+          ifaceName: iface,
+          txBytes,
+          rxBytes,
+          totalBytes: txBytes + rxBytes,
+          timestamp: now
+        });
+        hilog.info(DOMAIN, TAG, 'iface=%{public}s rx=%{public}d tx=%{public}d', iface, rxBytes, txBytes);
       } catch (err) {
         const e = err as BusinessError;
-        hilog.info(DOMAIN, TAG, 'iface %{public}s not available: code=%{public}d', iface, e.code ?? 0);
+        hilog.info(DOMAIN, TAG, 'iface %{public}s unavailable: code=%{public}d', iface, e.code ?? 0);
+      }
+    }
+
+    if (records.length === 0) {
+      try {
+        const rxBytes: number = await statistics.getAllRxBytes();
+        const txBytes: number = await statistics.getAllTxBytes();
+        records.push({
+          ifaceName: 'all',
+          txBytes,
+          rxBytes,
+          totalBytes: txBytes + rxBytes,
+          timestamp: now
+        });
+        hilog.info(DOMAIN, TAG, 'all interfaces rx=%{public}d tx=%{public}d', rxBytes, txBytes);
+      } catch (err) {
+        const e = err as BusinessError;
+        hilog.info(DOMAIN, TAG, 'all interfaces unavailable: code=%{public}d', e.code ?? 0);
+      }
+    }
+
+    if (records.length === 0) {
+      try {
+        const rxBytes: number = await statistics.getUidRxBytes(process.uid);
+        const txBytes: number = await statistics.getUidTxBytes(process.uid);
+        records.push({
+          ifaceName: 'app',
+          txBytes,
+          rxBytes,
+          totalBytes: txBytes + rxBytes,
+          timestamp: now
+        });
+        hilog.info(DOMAIN, TAG, 'app uid=%{public}d rx=%{public}d tx=%{public}d',
+          process.uid, rxBytes, txBytes);
+      } catch (err) {
+        const e = err as BusinessError;
+        hilog.info(DOMAIN, TAG, 'app uid unavailable: code=%{public}d', e.code ?? 0);
       }
     }
 
@@ -101,7 +138,8 @@ class NetworkMonitorService {
       snapshot.records.length, snapshot.capturedAt);
 
     storageService.getSettings().then((settings) => {
-      const totalBytes = snapshot.records.reduce((acc: number, r: InterfaceUsageRecord) => acc + r.totalBytes, 0);
+      const totalBytes = snapshot.records.reduce(
+        (acc: number, r: InterfaceUsageRecord) => acc + r.totalBytes, 0);
       const usedMB = totalBytes / (1024 * 1024);
       alertService.checkAndAlert(usedMB, settings.usageLimitMB, settings.notificationsEnabled)
         .catch((err: BusinessError) => {

@@ -48,81 +48,88 @@ export struct SettingsPage {
     });
   }
 
+  @Builder
+  StepButton(label: string, onTap: () => void) {
+    Column() {
+      Text(label)
+        .fontSize(20)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#E8E8F0')
+        .textAlign(TextAlign.Center)
+        .lineHeight(36)
+    }
+    .width(36)
+    .height(36)
+    .borderRadius(18)
+    .backgroundColor('#2A2A4E')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .onClick(onTap)
+  }
+
   build() {
     Column({ space: 0 }) {
       Text($r('app.string.settings_title'))
-        .fontSize(16)
+        .fontSize(15)
         .fontWeight(FontWeight.Bold)
         .fontColor('#E8E8F0')
         .width('100%')
         .textAlign(TextAlign.Center)
-        .padding({ top: 12, bottom: 8 })
+        .padding({ top: 10, bottom: 8 })
 
       Scroll() {
-        Column({ space: 12 }) {
-          Column({ space: 4 }) {
+        Column({ space: 14 }) {
+          Column({ space: 6 }) {
             Text($r('app.string.label_limit'))
-              .fontSize(12)
+              .fontSize(11)
               .fontColor('#8888AA')
               .width('100%')
+              .textAlign(TextAlign.Center)
             Row({ space: 8 }) {
-              Button('-')
-                .width(36)
-                .height(36)
-                .fontSize(18)
-                .fontColor('#E8E8F0')
-                .backgroundColor('#2A2A4E')
-                .borderRadius(18)
-                .onClick(() => {
-                  if (this.settings.usageLimitMB > 50) {
-                    this.settings.usageLimitMB -= 50;
-                    this.saveSettings();
-                  }
-                })
+              this.StepButton('−', () => {
+                if (this.settings.usageLimitMB > 50) {
+                  this.settings.usageLimitMB -= 50;
+                  this.saveSettings();
+                }
+              })
 
               Text(`${this.settings.usageLimitMB} MB`)
-                .fontSize(16)
+                .fontSize(15)
                 .fontColor('#00D4FF')
                 .fontWeight(FontWeight.Medium)
-                .width(80)
+                .width(76)
                 .textAlign(TextAlign.Center)
 
-              Button('+')
-                .width(36)
-                .height(36)
-                .fontSize(18)
-                .fontColor('#E8E8F0')
-                .backgroundColor('#2A2A4E')
-                .borderRadius(18)
-                .onClick(() => {
-                  this.settings.usageLimitMB += 50;
-                  this.saveSettings();
-                })
+              this.StepButton('+', () => {
+                this.settings.usageLimitMB += 50;
+                this.saveSettings();
+              })
             }
             .width('100%')
             .justifyContent(FlexAlign.Center)
           }
-          .padding({ left: 12, right: 12 })
 
           Row() {
             Text('Notifications')
               .fontSize(13)
               .fontColor('#E8E8F0')
               .layoutWeight(1)
+              .padding({ left: 12 })
             Toggle({ type: ToggleType.Switch, isOn: this.settings.notificationsEnabled })
               .onChange((isOn: boolean) => {
                 this.settings.notificationsEnabled = isOn;
                 this.saveSettings();
               })
               .selectedColor('#00D4FF')
+              .margin({ right: 12 })
           }
           .width('100%')
-          .padding({ left: 12, right: 12 })
+          .alignItems(VerticalAlign.Center)
 
           Button($r('app.string.label_reset_history'))
-            .width('80%')
-            .height(40)
-            .fontSize(13)
+            .width('76%')
+            .height(36)
+            .fontSize(12)
             .fontColor('#FF4757')
             .backgroundColor('#2A2A4E')
             .borderRadius(8)
@@ -138,9 +145,11 @@ export struct SettingsPage {
               .width('100%')
               .transition(TransitionEffect.OPACITY.animation({ duration: 300 }))
           }
+
+          Blank().height(24)
         }
         .width('100%')
-        .padding({ bottom: 16 })
+        .alignItems(HorizontalAlign.Center)
       }
       .width('100%')
       .layoutWeight(1)
