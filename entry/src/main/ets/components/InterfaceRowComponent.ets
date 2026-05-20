@@ -25,14 +25,14 @@ export struct InterfaceRowComponent {
       // RX tile
       MetricTileComponent({
         label: 'Received',
-        value: this.rxMB.toFixed(1) + ' MB',
+        value: `${this.rxMB.toFixed(1)} MB`,
         accentColor: this.accentColor
       })
 
       // TX tile
       MetricTileComponent({
         label: 'Sent',
-        value: this.txMB.toFixed(1) + ' MB',
+        value: `${this.txMB.toFixed(1)} MB`,
         accentColor: '#8888AA'
       })
     }

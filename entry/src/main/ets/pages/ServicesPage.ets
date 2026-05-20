@@ -9,7 +9,7 @@ const TAG = 'ServicesPage';
 
 const SERVICES_COUNT_KEY = 'netServicesCount';
 
-const SERVICE_TYPES: string[] = ['_http._tcp.local', '_https._tcp.local'];
+const SERVICE_TYPES: string[] = ['_http._tcp', '_https._tcp'];
 
 export interface DiscoveredService {
   serviceType: string;

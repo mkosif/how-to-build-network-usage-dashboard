@@ -1,6 +1,6 @@
 # How To Build Network Usage Dashboard
 
-**How To Build Network Usage Dashboard** is a HarmonyOS wearable codelab that demonstrates real-time network data monitoring on standalone cellular watches. It shows per-interface and per-app traffic consumption, enforces daily data limits with configurable quota policies, checks TLS certificate trust for network connections, and discovers nearby local services over mDNS — all in a compact circular-screen dashboard layout.
+**How To Build Network Usage Dashboard** is a HarmonyOS wearable codelab that demonstrates real-time network data monitoring on standalone cellular watches. It shows per-interface and per-app traffic consumption, enforces app-level daily data limits with local alert notifications, verifies PEM certificate trust against the device trust store, and discovers nearby local services over mDNS — all in a compact circular-screen dashboard layout.
 
 # Preview
 
@@ -14,8 +14,8 @@
 # Use Cases
 
 - **Real-time usage tracking:** View live Wi-Fi and cellular byte counts per network interface, updated every 30 seconds via `statistics.getIfaceRxBytes` and `statistics.getIfaceTxBytes`.
-- **Daily quota enforcement:** Set a daily data limit in MB; the app fires a system notification when usage reaches the threshold using `notificationManager.publish`.
-- **Certificate and cleartext policy inspection:** Check TLS connectivity and cleartext-traffic permissions for a host using `networkSecurity.isCleartextPermitted` and an HTTPS HEAD request.
+- **App-level daily limit alert:** Set a daily data limit in MB; the app fires a local notification when usage reaches the threshold using `notificationManager.publish`. The limit and notification preference are persisted in device storage via `@kit.ArkData`.
+- **Certificate trust verification:** Verify a PEM certificate against the device trust store using `networkSecurity.certVerification` and inspect per-host cleartext-traffic permissions with `networkSecurity.isCleartextPermitted`.
 - **mDNS service discovery:** Browse `_http._tcp` and `_https._tcp` services on the local network using `mdns.createDiscoveryService` and `mdns.resolveLocalService`.
 - **Historical data review:** Scroll through a 7-day bar-chart history of daily usage summaries stored in device preferences.
 
@@ -37,7 +37,7 @@
   > Required to query the default network handle and its capabilities (bearer type, metered status, bandwidth).
 
 - `ohos.permission.INTERNET`
-  > Required for the TLS certificate check that performs an HTTPS HEAD request to verify connectivity.
+  > Required by `networkSecurity.isCleartextPermitted` and `isCleartextPermittedByHostName` to inspect cleartext-traffic policy.
 
 - `ohos.permission.MANAGE_NET_STRATEGY`
   > Required to read per-interface and per-UID traffic statistics via the `statistics` module.
@@ -64,7 +64,7 @@ entry/src/main/ets/
 │   ├── DetailPage.ets               # Per-interface stats list
 │   ├── HistoryPage.ets              # 7-day usage bar chart
 │   ├── PolicyPage.ets               # Bearer type, metered status, bandwidth
-│   ├── SecurityPage.ets             # TLS status + cleartext policy
+│   ├── SecurityPage.ets             # PEM cert trust verification + cleartext policy
 │   ├── ServicesPage.ets             # mDNS service discovery browser
 │   └── SettingsPage.ets             # Daily limit, notifications, history reset
 ├── services/

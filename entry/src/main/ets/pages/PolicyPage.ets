@@ -88,14 +88,14 @@ export struct PolicyPage {
         if (caps.linkUpBandwidthKbps !== undefined && caps.linkUpBandwidthKbps > 0) {
           entries.push({
             label: 'Up',
-            value: (caps.linkUpBandwidthKbps / 1000).toFixed(1) + ' Mbps',
+            value: `${(caps.linkUpBandwidthKbps / 1000).toFixed(1)} Mbps`,
             highlight: false
           });
         }
         if (caps.linkDownBandwidthKbps !== undefined && caps.linkDownBandwidthKbps > 0) {
           entries.push({
             label: 'Down',
-            value: (caps.linkDownBandwidthKbps / 1000).toFixed(1) + ' Mbps',
+            value: `${(caps.linkDownBandwidthKbps / 1000).toFixed(1)} Mbps`,
             highlight: false
           });
         }

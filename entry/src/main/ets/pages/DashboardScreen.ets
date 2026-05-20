@@ -108,12 +108,12 @@ export struct DashboardScreen {
               Row({ space: 8 }) {
                 MetricTileComponent({
                   label: 'Wi-Fi',
-                  value: this.wifiMB().toFixed(1) + ' MB',
+                  value: `${this.wifiMB().toFixed(1)} MB`,
                   accentColor: '#00D4FF'
                 })
                 MetricTileComponent({
                   label: 'Mobile',
-                  value: this.mobileMB().toFixed(1) + ' MB',
+                  value: `${this.mobileMB().toFixed(1)} MB`,
                   accentColor: '#FF6B6B'
                 })
               }
