@@ -9,7 +9,6 @@ const TAG = 'SecurityPage';
 const CERT_RESULT_KEY = 'netCertResult';
 const CHECK_HOST: string = 'www.example.com';
 
-// ISRG Root X1 — Let's Encrypt root CA (public domain, widely trusted)
 const ISRG_ROOT_X1_PEM: string = `-----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
 TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
@@ -113,10 +112,17 @@ export struct SecurityPage {
       })
       .catch((err: BusinessError) => {
         this.checkedAt = Date.now();
-        this.certStatus = `Error (${err.code ?? -1})`;
-        this.certColor = '#FFB347';
-        AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Error');
-        hilog.info(DOMAIN, TAG, 'certVerification error: %{public}s', JSON.stringify(err));
+        const code = err.code ?? -1;
+        if (code >= 2305001 && code <= 2305099) {
+          this.certStatus = `Untrusted (${code})`;
+          this.certColor = '#FF4757';
+          AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Untrusted');
+        } else {
+          this.certStatus = `Error (${code})`;
+          this.certColor = '#FFB347';
+          AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Error');
+        }
+        hilog.info(DOMAIN, TAG, 'certVerification code=%{public}d for %{public}s', code, CHECK_HOST);
       })
       .finally(() => {
         this.isChecking = false;

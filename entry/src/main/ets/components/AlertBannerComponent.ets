@@ -1,7 +1,3 @@
-/**
- * AlertBannerComponent — full-width alert bar shown when usage exceeds limit.
- * Animates in/out based on the `visible` prop.
- */
 @Component
 export struct AlertBannerComponent {
   @Prop visible: boolean = false;

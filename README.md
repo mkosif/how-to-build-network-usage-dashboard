@@ -1,23 +1,14 @@
 # How To Build Network Usage Dashboard
 
-**How To Build Network Usage Dashboard** is a HarmonyOS wearable codelab that demonstrates real-time network data monitoring on standalone cellular watches. It shows per-interface and per-app traffic consumption, enforces app-level daily data limits with local alert notifications, verifies PEM certificate trust against the device trust store, and discovers nearby local services over mDNS — all in a compact circular-screen dashboard layout.
-
-# Preview
-
-<div align="center">
-  <img src="screenshots/1.png" width="24%" alt="Dashboard overview" />
-  <img src="screenshots/2.png" width="24%" alt="Interface detail and history" />
-  <img src="screenshots/3.png" width="24%" alt="Network policy and security" />
-  <img src="screenshots/4.png" width="24%" alt="Local services discovery" />
-</div>
+**How To Build Network Usage Dashboard** is a HarmonyOS wearable codelab that demonstrates real-time network awareness on standalone cellular watches. It shows per-interface traffic consumption, applies an app-level usage threshold with local alert notifications, verifies PEM certificate trust against the device trust store, and discovers nearby local services over mDNS — all in a compact circular-screen dashboard layout.
 
 # Use Cases
 
 - **Real-time usage tracking:** View live Wi-Fi and cellular byte counts per network interface, updated every 30 seconds via `statistics.getIfaceRxBytes` and `statistics.getIfaceTxBytes`.
-- **App-level daily limit alert:** Set a daily data limit in MB; the app fires a local notification when usage reaches the threshold using `notificationManager.publish`. The limit and notification preference are persisted in device storage via `@kit.ArkData`.
+- **App-level usage threshold:** Set a usage limit in MB; the app fires a local notification when the observed interface traffic reaches the threshold using `notificationManager.publish`. The limit and notification preference are persisted in device storage via `@kit.ArkData`.
 - **Certificate trust verification:** Verify a PEM certificate against the device trust store using `networkSecurity.certVerification` and inspect per-host cleartext-traffic permissions with `networkSecurity.isCleartextPermitted`.
 - **mDNS service discovery:** Browse `_http._tcp` and `_https._tcp` services on the local network using `mdns.createDiscoveryService` and `mdns.resolveLocalService`.
-- **Historical data review:** Scroll through a 7-day bar-chart history of daily usage summaries stored in device preferences.
+- **Saved usage review:** Scroll through recent saved usage snapshots stored in device preferences.
 
 # Technology
 
@@ -27,9 +18,9 @@
 - **Frameworks**: HarmonyOS SDK 6.0.1
 - **Tools**: DevEco Studio NEXT
 - **Libraries**:
-  - `@kit.NetworkKit` — statistics, connection, networkSecurity, mdns
-  - `@kit.NotificationKit` — system alert notifications
-  - `@kit.ArkData` — preferences-based persistent storage
+  - `@kit.NetworkKit` - statistics, connection, networkSecurity, mdns
+  - `@kit.NotificationKit` - system alert notifications
+  - `@kit.ArkData` - preferences-based persistent storage
 
 ## Required Permissions
 
@@ -40,7 +31,7 @@
   > Required by `networkSecurity.isCleartextPermitted` and `isCleartextPermittedByHostName` to inspect cleartext-traffic policy.
 
 - `ohos.permission.MANAGE_NET_STRATEGY`
-  > Required to read per-interface and per-UID traffic statistics via the `statistics` module.
+  > Required to read per-interface traffic statistics via the `statistics` module. This is a system-basic permission, so unsigned builds may receive permission errors on some devices.
 
 # Directory Structure
 
@@ -56,19 +47,19 @@ entry/src/main/ets/
 ├── entrybackupability/
 │   └── EntryBackupAbility.ets
 ├── models/
-│   ├── NetworkModel.ets             # UsageSnapshot, InterfaceUsageRecord, AppUsageRecord, DailyUsageSummary
-│   └── SettingsModel.ets            # dailyLimitMB, refreshIntervalSec, notificationsEnabled
+│   ├── NetworkModel.ets             # UsageSnapshot, InterfaceUsageRecord, UsageHistoryRecord
+│   └── SettingsModel.ets            # usageLimitMB, refreshIntervalSec, notificationsEnabled
 ├── pages/
 │   ├── Index.ets                    # ArcSwiper entry shell
 │   ├── DashboardScreen.ets          # Usage ring + Wi-Fi / mobile tiles
 │   ├── DetailPage.ets               # Per-interface stats list
-│   ├── HistoryPage.ets              # 7-day usage bar chart
+│   ├── HistoryPage.ets              # Recent saved usage bar chart
 │   ├── PolicyPage.ets               # Bearer type, metered status, bandwidth
 │   ├── SecurityPage.ets             # PEM cert trust verification + cleartext policy
 │   ├── ServicesPage.ets             # mDNS service discovery browser
-│   └── SettingsPage.ets             # Daily limit, notifications, history reset
+│   └── SettingsPage.ets             # Usage limit, notifications, history reset
 ├── services/
-│   ├── AlertService.ets             # Quota alert — fires once per day
+│   ├── AlertService.ets             # Usage threshold notification
 │   ├── NetworkMonitorService.ets    # 30-second polling, statistics API wrapper
 │   └── StorageService.ets           # Preferences read/write for history and settings
 └── utils/

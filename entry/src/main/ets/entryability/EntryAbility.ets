@@ -2,7 +2,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { storageService } from '../services/StorageService';
-import { UsageSnapshot, DailyUsageSummary } from '../models/NetworkModel';
+import { UsageSnapshot, UsageHistoryRecord } from '../models/NetworkModel';
 
 const DOMAIN = 0x0000;
 
@@ -71,19 +71,19 @@ export default class EntryAbility extends UIAbility {
           .filter(r => isWifi(r.ifaceName))
           .reduce((acc, r) => acc + r.totalBytes, 0);
 
-        const record: DailyUsageSummary = {
+        const record: UsageHistoryRecord = {
           date: todayDateString(),
           totalBytes,
           wifiBytes,
           mobileBytes: totalBytes - wifiBytes
         };
 
-        storageService.appendDailyRecord(record).then(() => {
-          hilog.info(DOMAIN, 'testTag', 'Daily usage record appended on background: %{public}s', record.date);
+        storageService.appendUsageRecord(record).then(() => {
+          hilog.info(DOMAIN, 'testTag', 'Usage record appended on background: %{public}s', record.date);
         });
       }
     } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to append daily record on background: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, 'testTag', 'Failed to append usage record on background: %{public}s', JSON.stringify(err));
     }
   }
 }

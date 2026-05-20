@@ -1,6 +1,3 @@
-/**
- * MetricTileComponent — compact label + value tile for wearable dashboards.
- */
 @Component
 export struct MetricTileComponent {
   @Prop label: string = '';

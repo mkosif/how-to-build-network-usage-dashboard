@@ -3,11 +3,11 @@ export interface InterfaceUsageRecord {
   txBytes: number;
   rxBytes: number;
   totalBytes: number;
-  timestamp: number; // unix ms
+  timestamp: number;
 }
 
-export interface DailyUsageSummary {
-  date: string; // YYYY-MM-DD
+export interface UsageHistoryRecord {
+  date: string;
   totalBytes: number;
   wifiBytes: number;
   mobileBytes: number;
@@ -15,13 +15,5 @@ export interface DailyUsageSummary {
 
 export interface UsageSnapshot {
   records: InterfaceUsageRecord[];
-  capturedAt: number; // unix ms
-}
-
-export interface AppUsageRecord {
-  uid: number;
-  appName: string;
-  txBytes: number;
-  rxBytes: number;
-  totalBytes: number;
+  capturedAt: number;
 }

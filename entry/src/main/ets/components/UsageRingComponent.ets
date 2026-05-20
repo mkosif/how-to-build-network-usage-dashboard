@@ -1,7 +1,3 @@
-/**
- * UsageRingComponent — circular progress ring for wearable usage display.
- * Shows used/limit ratio with a colour-coded arc and centre label.
- */
 @Component
 export struct UsageRingComponent {
   @Prop usedMB: number = 0;
@@ -19,17 +15,16 @@ export struct UsageRingComponent {
 
   private get ringColor(): string {
     if (this.ratio >= 1) {
-      return '#FF4757'; // accent_red
+      return '#FF4757';
     }
     if (this.ratio >= 0.8) {
-      return '#00FF94'; // accent_green
+      return '#00FF94';
     }
-    return '#00D4FF'; // ring_active
+    return '#00D4FF';
   }
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
-      // Progress arc — ring style with track colour as background
       Progress({ value: this.ratio * 100, total: 100, type: ProgressType.Ring })
         .width(this.ringSize)
         .height(this.ringSize)
@@ -40,7 +35,6 @@ export struct UsageRingComponent {
         .color(this.ringColor)
         .backgroundColor('#2A2A4E')
 
-      // Centre label — value
       Column() {
         Text(this.usedMB.toFixed(1))
           .fontSize(20)

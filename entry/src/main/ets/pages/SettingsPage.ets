@@ -74,13 +74,13 @@ export struct SettingsPage {
                 .backgroundColor('#2A2A4E')
                 .borderRadius(18)
                 .onClick(() => {
-                  if (this.settings.dailyLimitMB > 50) {
-                    this.settings.dailyLimitMB -= 50;
+                  if (this.settings.usageLimitMB > 50) {
+                    this.settings.usageLimitMB -= 50;
                     this.saveSettings();
                   }
                 })
 
-              Text(`${this.settings.dailyLimitMB} MB`)
+              Text(`${this.settings.usageLimitMB} MB`)
                 .fontSize(16)
                 .fontColor('#00D4FF')
                 .fontWeight(FontWeight.Medium)
@@ -95,7 +95,7 @@ export struct SettingsPage {
                 .backgroundColor('#2A2A4E')
                 .borderRadius(18)
                 .onClick(() => {
-                  this.settings.dailyLimitMB += 50;
+                  this.settings.usageLimitMB += 50;
                   this.saveSettings();
                 })
             }

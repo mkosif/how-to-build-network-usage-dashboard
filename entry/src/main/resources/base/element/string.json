@@ -58,7 +58,7 @@
     },
     {
       "name": "label_limit",
-      "value": "Daily Limit"
+      "value": "Usage Limit"
     },
     {
       "name": "label_reset_history",

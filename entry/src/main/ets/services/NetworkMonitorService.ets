@@ -1,7 +1,7 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { statistics } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { InterfaceUsageRecord, UsageSnapshot, AppUsageRecord } from '../models/NetworkModel';
+import { InterfaceUsageRecord, UsageSnapshot } from '../models/NetworkModel';
 import { alertService } from './AlertService';
 import { storageService } from './StorageService';
 
@@ -11,10 +11,8 @@ const TAG = 'NetworkMonitorService';
 const SNAPSHOT_KEY = 'netSnapshot';
 const SNAPSHOT_READY_KEY = 'netSnapshotReady';
 const SNAPSHOT_ERROR_KEY = 'netSnapshotError';
-const APP_USAGE_KEY = 'netAppUsage';
 
 const KNOWN_IFACES: string[] = ['wlan0', 'rmnet0', 'eth0', 'lo'];
-const SAMPLE_UIDS: number[] = [0, 1000, 10000, 10001, 10002];
 
 class NetworkMonitorService {
   private static instance: NetworkMonitorService | null = null;
@@ -60,11 +58,6 @@ class NetworkMonitorService {
     this.fetchIfaceStats()
       .then((snapshot: UsageSnapshot) => {
         this.publishSnapshot(snapshot, false);
-        return this.fetchAppStats();
-      })
-      .then((appRecords: AppUsageRecord[]) => {
-        AppStorage.setOrCreate<AppUsageRecord[]>(APP_USAGE_KEY, appRecords);
-        hilog.info(DOMAIN, TAG, 'App usage published: %{public}d records', appRecords.length);
       })
       .catch((err: BusinessError) => {
         hilog.error(DOMAIN, TAG, 'Poll failed: %{public}s', JSON.stringify(err));
@@ -100,31 +93,6 @@ class NetworkMonitorService {
     return { records, capturedAt: now };
   }
 
-  private async fetchAppStats(): Promise<AppUsageRecord[]> {
-    const results: AppUsageRecord[] = [];
-
-    for (const uid of SAMPLE_UIDS) {
-      try {
-        const rxBytes: number = await statistics.getUidRxBytes(uid);
-        const txBytes: number = await statistics.getUidTxBytes(uid);
-        if (rxBytes > 0 || txBytes > 0) {
-          results.push({
-            uid,
-            appName: `UID ${uid}`,
-            txBytes,
-            rxBytes,
-            totalBytes: txBytes + rxBytes
-          });
-        }
-      } catch (err) {
-        const e = err as BusinessError;
-        hilog.info(DOMAIN, TAG, 'uid %{public}d stats not available: code=%{public}d', uid, e.code ?? 0);
-      }
-    }
-
-    return results;
-  }
-
   private publishSnapshot(snapshot: UsageSnapshot, hasError: boolean): void {
     AppStorage.setOrCreate<UsageSnapshot>(SNAPSHOT_KEY, snapshot);
     AppStorage.setOrCreate<boolean>(SNAPSHOT_READY_KEY, true);
@@ -135,7 +103,7 @@ class NetworkMonitorService {
     storageService.getSettings().then((settings) => {
       const totalBytes = snapshot.records.reduce((acc: number, r: InterfaceUsageRecord) => acc + r.totalBytes, 0);
       const usedMB = totalBytes / (1024 * 1024);
-      alertService.checkAndAlert(usedMB, settings.dailyLimitMB, settings.notificationsEnabled)
+      alertService.checkAndAlert(usedMB, settings.usageLimitMB, settings.notificationsEnabled)
         .catch((err: BusinessError) => {
           hilog.error(DOMAIN, TAG, 'Alert check error: %{public}s', JSON.stringify(err));
         });

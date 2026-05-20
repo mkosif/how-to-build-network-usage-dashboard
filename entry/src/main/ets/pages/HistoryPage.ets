@@ -1,21 +1,21 @@
 import { ArcList, ArcListItem } from '@kit.ArkUI';
-import { DailyUsageSummary, UsageSnapshot } from '../models/NetworkModel';
+import { UsageHistoryRecord, UsageSnapshot } from '../models/NetworkModel';
 import { storageService } from '../services/StorageService';
 import { bytesToMB, isWifi, todayDateString } from '../utils/NetworkUtils';
 import { BasicDataSource } from '../utils/BasicDataSource';
 
 @Component
 export struct HistoryPage {
-  @State @Watch('onDataChange') historyRecords: DailyUsageSummary[] = [];
+  @State @Watch('onDataChange') historyRecords: UsageHistoryRecord[] = [];
   @State isLoading: boolean = true;
   @StorageProp('netSnapshot') @Watch('onDataChange') snapshot: UsageSnapshot =
     { records: [], capturedAt: 0 };
-  private historySource: BasicDataSource<DailyUsageSummary> =
-    new BasicDataSource<DailyUsageSummary>([]);
+  private historySource: BasicDataSource<UsageHistoryRecord> =
+    new BasicDataSource<UsageHistoryRecord>([]);
 
   aboutToAppear(): void {
     this.historySource.setData(this.allRecords());
-    storageService.getDailyHistory().then((records: DailyUsageSummary[]) => {
+    storageService.getUsageHistory().then((records: UsageHistoryRecord[]) => {
       this.historyRecords = records;
       this.isLoading = false;
     });
@@ -26,13 +26,13 @@ export struct HistoryPage {
     this.historySource.notifyDataReload();
   }
 
-  private allRecords(): DailyUsageSummary[] {
+  private allRecords(): UsageHistoryRecord[] {
     const todayTotal = this.snapshot.records.reduce((acc, r) => acc + r.totalBytes, 0);
     const wifiTotal = this.snapshot.records
       .filter(r => isWifi(r.ifaceName))
       .reduce((acc, r) => acc + r.totalBytes, 0);
 
-    const todayEntry: DailyUsageSummary = {
+    const todayEntry: UsageHistoryRecord = {
       date: todayDateString(),
       totalBytes: todayTotal,
       wifiBytes: wifiTotal,
@@ -83,7 +83,7 @@ export struct HistoryPage {
       } else {
         Column() {
           ArcList() {
-            LazyForEach(this.historySource, (record: DailyUsageSummary) => {
+            LazyForEach(this.historySource, (record: UsageHistoryRecord) => {
               ArcListItem() {
                 Column({ space: 3 }) {
                   Row() {
@@ -111,7 +111,7 @@ export struct HistoryPage {
                 }
                 .padding({ left: 12, right: 12, top: 6, bottom: 6 })
               }
-            }, (record: DailyUsageSummary) => record.date)
+            }, (record: UsageHistoryRecord) => record.date)
           }
         }
         .width('100%')

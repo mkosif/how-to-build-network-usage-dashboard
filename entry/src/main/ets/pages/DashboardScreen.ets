@@ -53,7 +53,7 @@ export struct DashboardScreen {
   }
 
   private isOverLimit(): boolean {
-    return this.settings.dailyLimitMB > 0 && this.totalMB() >= this.settings.dailyLimitMB;
+    return this.settings.usageLimitMB > 0 && this.totalMB() >= this.settings.usageLimitMB;
   }
 
   build() {
@@ -95,7 +95,7 @@ export struct DashboardScreen {
 
                 UsageRingComponent({
                   usedMB: this.totalMB(),
-                  limitMB: this.settings.dailyLimitMB,
+                  limitMB: this.settings.usageLimitMB,
                   label: 'MB'
                 })
               }

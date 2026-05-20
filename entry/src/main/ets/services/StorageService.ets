@@ -1,14 +1,14 @@
 import { preferences } from '@kit.ArkData';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
-import { DailyUsageSummary } from '../models/NetworkModel';
+import { UsageHistoryRecord } from '../models/NetworkModel';
 import { SettingsModel } from '../models/SettingsModel';
 
 const DOMAIN = 0x0001;
 const TAG = 'StorageService';
 const STORE_NAME = 'net_usage_prefs';
-const KEY_HISTORY = 'daily_history';
-const KEY_LIMIT_MB = 'dailyLimitMB';
+const KEY_HISTORY = 'usage_history';
+const KEY_LIMIT_MB = 'usageLimitMB';
 const KEY_INTERVAL_SEC = 'refreshIntervalSec';
 const KEY_NOTIFICATIONS = 'notificationsEnabled';
 const MAX_HISTORY_DAYS = 7;
@@ -42,10 +42,10 @@ export class StorageService {
       return s;
     }
     try {
-      s.dailyLimitMB = (await this.store.get(KEY_LIMIT_MB, s.dailyLimitMB)) as number;
+      s.usageLimitMB = (await this.store.get(KEY_LIMIT_MB, s.usageLimitMB)) as number;
       s.refreshIntervalSec = (await this.store.get(KEY_INTERVAL_SEC, s.refreshIntervalSec)) as number;
       s.notificationsEnabled = (await this.store.get(KEY_NOTIFICATIONS, s.notificationsEnabled)) as boolean;
-      hilog.info(DOMAIN, TAG, 'Settings loaded: limit=%{public}d MB', s.dailyLimitMB);
+      hilog.info(DOMAIN, TAG, 'Settings loaded: limit=%{public}d MB', s.usageLimitMB);
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'Failed to load settings: %{public}s', JSON.stringify(err));
     }
@@ -58,24 +58,24 @@ export class StorageService {
       return;
     }
     try {
-      await this.store.put(KEY_LIMIT_MB, s.dailyLimitMB);
+      await this.store.put(KEY_LIMIT_MB, s.usageLimitMB);
       await this.store.put(KEY_INTERVAL_SEC, s.refreshIntervalSec);
       await this.store.put(KEY_NOTIFICATIONS, s.notificationsEnabled);
       await this.store.flush();
-      hilog.info(DOMAIN, TAG, 'Settings saved: limit=%{public}d MB', s.dailyLimitMB);
+      hilog.info(DOMAIN, TAG, 'Settings saved: limit=%{public}d MB', s.usageLimitMB);
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'Failed to save settings: %{public}s', JSON.stringify(err));
     }
   }
 
-  async getDailyHistory(): Promise<DailyUsageSummary[]> {
+  async getUsageHistory(): Promise<UsageHistoryRecord[]> {
     if (!this.store) {
-      hilog.error(DOMAIN, TAG, 'getDailyHistory called before init');
+      hilog.error(DOMAIN, TAG, 'getUsageHistory called before init');
       return [];
     }
     try {
       const raw = (await this.store.get(KEY_HISTORY, '[]')) as string;
-      const history: DailyUsageSummary[] = JSON.parse(raw);
+      const history: UsageHistoryRecord[] = JSON.parse(raw);
       hilog.info(DOMAIN, TAG, 'History loaded: %{public}d records', history.length);
       return history;
     } catch (err) {
@@ -84,13 +84,13 @@ export class StorageService {
     }
   }
 
-  async appendDailyRecord(record: DailyUsageSummary): Promise<void> {
+  async appendUsageRecord(record: UsageHistoryRecord): Promise<void> {
     if (!this.store) {
-      hilog.error(DOMAIN, TAG, 'appendDailyRecord called before init');
+      hilog.error(DOMAIN, TAG, 'appendUsageRecord called before init');
       return;
     }
     try {
-      const history = await this.getDailyHistory();
+      const history = await this.getUsageHistory();
       const existingIndex = history.findIndex(h => h.date === record.date);
       if (existingIndex >= 0) {
         history[existingIndex] = record;
@@ -100,7 +100,7 @@ export class StorageService {
       const trimmed = history.slice(-MAX_HISTORY_DAYS);
       await this.store.put(KEY_HISTORY, JSON.stringify(trimmed));
       await this.store.flush();
-      hilog.info(DOMAIN, TAG, 'History record appended for date: %{public}s', record.date);
+      hilog.info(DOMAIN, TAG, 'Usage record appended for date: %{public}s', record.date);
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'Failed to append history record: %{public}s', JSON.stringify(err));
     }

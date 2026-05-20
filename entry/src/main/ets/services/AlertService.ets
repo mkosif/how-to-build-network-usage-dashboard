@@ -55,7 +55,7 @@ class AlertService {
           notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
           normal: {
             title: 'Data Limit Reached',
-            text: `Used ${usedMB.toFixed(1)} MB of ${limitMB} MB daily limit`,
+            text: `Used ${usedMB.toFixed(1)} MB of ${limitMB} MB limit`,
             additionalText: 'Net Dashboard'
           }
         }
