@@ -42,23 +42,25 @@ export struct DetailPage {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList() {
-          LazyForEach(this.recordSource, (record: InterfaceUsageRecord) => {
-            ArcListItem() {
-              InterfaceRowComponent({
-                ifaceName: record.ifaceName,
-                rxMB: bytesToMB(record.rxBytes),
-                txMB: bytesToMB(record.txBytes),
-                accentColor: isWifi(record.ifaceName) ? '#00D4FF' : '#FF6B6B'
-              })
-            }
-          }, (record: InterfaceUsageRecord) => record.ifaceName)
+        Column() {
+          ArcList() {
+            LazyForEach(this.recordSource, (record: InterfaceUsageRecord) => {
+              ArcListItem() {
+                InterfaceRowComponent({
+                  ifaceName: record.ifaceName,
+                  rxMB: bytesToMB(record.rxBytes),
+                  txMB: bytesToMB(record.txBytes),
+                  accentColor: isWifi(record.ifaceName) ? '#00D4FF' : '#FF6B6B'
+                })
+              }
+            }, (record: InterfaceUsageRecord) => record.ifaceName)
+          }
         }
         .width('100%')
         .layoutWeight(1)
       }
 
-      Text('Updated: ' + formattedTime(this.snapshot.capturedAt))
+      Text(`Updated: ${formattedTime(this.snapshot.capturedAt)}`)
         .fontSize(10)
         .fontColor('#8888AA')
         .textAlign(TextAlign.Center)

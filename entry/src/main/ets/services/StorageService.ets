@@ -91,14 +91,12 @@ export class StorageService {
     }
     try {
       const history = await this.getDailyHistory();
-      // Replace existing entry for same date or append
       const existingIndex = history.findIndex(h => h.date === record.date);
       if (existingIndex >= 0) {
         history[existingIndex] = record;
       } else {
         history.push(record);
       }
-      // Keep only the last MAX_HISTORY_DAYS days
       const trimmed = history.slice(-MAX_HISTORY_DAYS);
       await this.store.put(KEY_HISTORY, JSON.stringify(trimmed));
       await this.store.flush();

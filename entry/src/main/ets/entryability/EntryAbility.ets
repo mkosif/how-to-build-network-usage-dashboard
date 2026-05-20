@@ -29,7 +29,6 @@ export default class EntryAbility extends UIAbility {
     }
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
 
-    // Store context in AppStorage so pages can access it for StorageService init
     AppStorage.setOrCreate('abilityContext', this.context);
   }
 
@@ -40,7 +39,6 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    // Initialise storage service with the ability context
     storageService.init(this.context).then(() => {
       hilog.info(DOMAIN, 'testTag', 'StorageService initialized in onWindowStageCreate');
     });
@@ -65,7 +63,6 @@ export default class EntryAbility extends UIAbility {
   onBackground(): void {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
 
-    // Append today's usage snapshot to history
     try {
       const snapshot = AppStorage.get<UsageSnapshot>('netSnapshot');
       if (snapshot && snapshot.records.length > 0) {

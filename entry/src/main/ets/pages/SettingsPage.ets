@@ -80,7 +80,7 @@ export struct SettingsPage {
                   }
                 })
 
-              Text(this.settings.dailyLimitMB + ' MB')
+              Text(`${this.settings.dailyLimitMB} MB`)
                 .fontSize(16)
                 .fontColor('#00D4FF')
                 .fontWeight(FontWeight.Medium)

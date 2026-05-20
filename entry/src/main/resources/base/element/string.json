@@ -13,10 +13,6 @@
       "value": "label"
     },
     {
-      "name": "app_name",
-      "value": "Net Dashboard"
-    },
-    {
       "name": "dashboard_title",
       "value": "Network Usage"
     },

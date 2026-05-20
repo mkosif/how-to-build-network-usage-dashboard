@@ -14,7 +14,6 @@ function todayDateString(): string {
 
 class AlertService {
   private static instance: AlertService | null = null;
-  // Track the date of the last fired alert to avoid repeated notifications
   private lastAlertDate: string = '';
 
   static getInstance(): AlertService {

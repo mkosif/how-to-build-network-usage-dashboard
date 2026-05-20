@@ -88,51 +88,53 @@ export struct DashboardScreen {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList({ header: this.header }) {
-          ArcListItem() {
-            Column({ space: 4 }) {
+        Column() {
+          ArcList({ header: this.header }) {
+            ArcListItem() {
+              Column({ space: 4 }) {
 
-              UsageRingComponent({
-                usedMB: this.totalMB(),
-                limitMB: this.settings.dailyLimitMB,
-                label: 'MB'
-              })
-            }
-            .width('100%')
-            .alignItems(HorizontalAlign.Center)
-            .padding({ top: 8, bottom: 4 })
-          }
-
-          ArcListItem() {
-            Row({ space: 8 }) {
-              MetricTileComponent({
-                label: 'Wi-Fi',
-                value: this.wifiMB().toFixed(1) + ' MB',
-                accentColor: '#00D4FF'
-              })
-              MetricTileComponent({
-                label: 'Mobile',
-                value: this.mobileMB().toFixed(1) + ' MB',
-                accentColor: '#FF6B6B'
-              })
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.Center)
-            .padding({
-              left: 8,
-              right: 8,
-              top: 4,
-              bottom: 4
-            })
-          }
-
-          ArcListItem() {
-            Text('Updated: ' + formattedTime(this.snapshot.capturedAt))
-              .fontSize(10)
-              .fontColor('#8888AA')
-              .textAlign(TextAlign.Center)
+                UsageRingComponent({
+                  usedMB: this.totalMB(),
+                  limitMB: this.settings.dailyLimitMB,
+                  label: 'MB'
+                })
+              }
               .width('100%')
-              .padding({ top: 4, bottom: 8 })
+              .alignItems(HorizontalAlign.Center)
+              .padding({ top: 8, bottom: 4 })
+            }
+
+            ArcListItem() {
+              Row({ space: 8 }) {
+                MetricTileComponent({
+                  label: 'Wi-Fi',
+                  value: this.wifiMB().toFixed(1) + ' MB',
+                  accentColor: '#00D4FF'
+                })
+                MetricTileComponent({
+                  label: 'Mobile',
+                  value: this.mobileMB().toFixed(1) + ' MB',
+                  accentColor: '#FF6B6B'
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.Center)
+              .padding({
+                left: 8,
+                right: 8,
+                top: 4,
+                bottom: 4
+              })
+            }
+
+            ArcListItem() {
+              Text(`Updated: ${formattedTime(this.snapshot.capturedAt)}`)
+                .fontSize(10)
+                .fontColor('#8888AA')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+                .padding({ top: 4, bottom: 8 })
+            }
           }
         }
         .width('100%')

@@ -27,14 +27,16 @@ struct Index {
 
   build() {
     Column({ space: 0 }) {
-      ArcSwiper() {
-        DashboardScreen()
-        DetailPage()
-        HistoryPage()
-        SettingsPage()
-        PolicyPage()
-        SecurityPage()
-        ServicesPage()
+      Column() {
+        ArcSwiper() {
+          DashboardScreen()
+          DetailPage()
+          HistoryPage()
+          SettingsPage()
+          PolicyPage()
+          SecurityPage()
+          ServicesPage()
+        }
       }
       .width('100%')
       .height('100%')

@@ -30,7 +30,7 @@ export struct ServicesPage {
   private context: common.UIAbilityContext | null = null;
 
   aboutToAppear(): void {
-    this.context = getContext(this) as common.UIAbilityContext;
+    this.context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.startDiscovery();
   }
 
@@ -99,7 +99,6 @@ export struct ServicesPage {
       })
       .catch((err: Error) => {
         hilog.info(DOMAIN, TAG, 'resolveLocalService failed: %{public}s', JSON.stringify(err));
-        // Add with unresolved host
         this.addOrUpdateService({
           serviceType,
           serviceName: info.serviceName ?? '',
@@ -187,32 +186,34 @@ export struct ServicesPage {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList() {
-          LazyForEach(this.serviceSource, (entry: DiscoveredService) => {
-            ArcListItem() {
-              Column({ space: 3 }) {
-                Text(entry.serviceName)
-                  .fontSize(12)
-                  .fontColor('#E8E8F0')
-                  .width('100%')
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                Row({ space: 6 }) {
-                  Text(entry.serviceType)
-                    .fontSize(9)
-                    .fontColor('#00D4FF')
-                  Text(entry.host + (entry.port > 0 ? ':' + entry.port.toString() : ''))
-                    .fontSize(9)
-                    .fontColor('#8888AA')
-                    .layoutWeight(1)
+        Column() {
+          ArcList() {
+            LazyForEach(this.serviceSource, (entry: DiscoveredService) => {
+              ArcListItem() {
+                Column({ space: 3 }) {
+                  Text(entry.serviceName)
+                    .fontSize(12)
+                    .fontColor('#E8E8F0')
+                    .width('100%')
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Row({ space: 6 }) {
+                    Text(entry.serviceType)
+                      .fontSize(9)
+                      .fontColor('#00D4FF')
+                    Text(`${entry.host}${entry.port > 0 ? `:${entry.port}` : ''}`)
+                      .fontSize(9)
+                      .fontColor('#8888AA')
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                  .width('100%')
                 }
-                .width('100%')
+                .padding({ left: 12, right: 12, top: 6, bottom: 6 })
               }
-              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-            }
-          }, (entry: DiscoveredService) => entry.serviceType + '|' + entry.serviceName)
+            }, (entry: DiscoveredService) => `${entry.serviceType}|${entry.serviceName}`)
+          }
         }
         .width('100%')
         .layoutWeight(1)

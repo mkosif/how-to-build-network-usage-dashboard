@@ -7,7 +7,8 @@ import { formattedTime } from '../utils/NetworkUtils';
 const DOMAIN = 0x0003;
 const TAG = 'SecurityPage';
 const CERT_RESULT_KEY = 'netCertResult';
-const CHECK_HOST = 'www.example.com';
+const CHECK_SCHEME: string = 'https';
+const CHECK_HOST: string = 'www.example.com';
 
 // SSL/TLS error codes from the http module
 const SSL_ERROR_CODES: number[] = [2300035, 2300058, 2300060, 2300062];
@@ -71,8 +72,9 @@ export struct SecurityPage {
     this.errorMsg = '';
 
     const req = http.createHttp();
+    const target: string = `${CHECK_SCHEME}://${CHECK_HOST}`;
     req.request(
-      'https://' + CHECK_HOST,
+      target,
       {
         method: http.RequestMethod.HEAD,
         connectTimeout: 8000,
@@ -88,16 +90,16 @@ export struct SecurityPage {
       const code = err.code ?? 0;
       this.checkedAt = Date.now();
       if (SSL_ERROR_CODES.indexOf(code) >= 0) {
-        this.tlsStatus = 'Invalid (SSL ' + code.toString() + ')';
+        this.tlsStatus = `Invalid (SSL ${code})`;
         this.tlsColor = '#FF4757';
         AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Invalid');
       } else if (code === 2300006 || code === 2300007 || code === 2300028) {
         this.tlsStatus = 'Unreachable';
         this.tlsColor = '#FFB347';
-        this.errorMsg = 'Cannot reach ' + CHECK_HOST;
+        this.errorMsg = `Cannot reach ${CHECK_HOST}`;
         AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Unreachable');
       } else {
-        this.tlsStatus = 'Error (' + code.toString() + ')';
+        this.tlsStatus = `Error (${code})`;
         this.tlsColor = '#FF4757';
         AppStorage.setOrCreate<string>(CERT_RESULT_KEY, 'Error');
       }
@@ -124,88 +126,90 @@ export struct SecurityPage {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList({ header: this.header }) {
-          ArcListItem() {
-            Column({ space: 6 }) {
-              Row({ space: 8 }) {
-                Text('TLS Status:')
-                  .fontSize(12)
-                  .fontColor('#8888AA')
-                Text(this.tlsStatus)
-                  .fontSize(13)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor(this.tlsColor)
-              }
-              .justifyContent(FlexAlign.Center)
-              .alignItems(VerticalAlign.Center)
-              .width('100%')
+        Column() {
+          ArcList({ header: this.header }) {
+            ArcListItem() {
+              Column({ space: 6 }) {
+                Row({ space: 8 }) {
+                  Text('TLS Status:')
+                    .fontSize(12)
+                    .fontColor('#8888AA')
+                  Text(this.tlsStatus)
+                    .fontSize(13)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor(this.tlsColor)
+                }
+                .justifyContent(FlexAlign.Center)
+                .alignItems(VerticalAlign.Center)
+                .width('100%')
 
-              if (this.errorMsg !== '') {
-                Text(this.errorMsg)
+                if (this.errorMsg !== '') {
+                  Text(this.errorMsg)
+                    .fontSize(10)
+                    .fontColor('#FFB347')
+                    .width('100%')
+                }
+
+                Text(`Checked: ${formattedTime(this.checkedAt)}`)
                   .fontSize(10)
-                  .fontColor('#FFB347')
+                  .fontColor('#8888AA')
                   .width('100%')
               }
-
-              Text('Checked: ' + formattedTime(this.checkedAt))
-                .fontSize(10)
-                .fontColor('#8888AA')
-                .width('100%')
-            }
-            .padding({
-              left: 16,
-              right: 16,
-              top: 10,
-              bottom: 8
-            })
-          }
-
-          ArcListItem() {
-            Column({ space: 4 }) {
-              Row() {
-                Text('Cleartext (all):')
-                  .fontSize(11)
-                  .fontColor('#8888AA')
-                  .layoutWeight(1)
-                Text(this.cleartextAllowed ? 'Allowed' : 'Blocked')
-                  .fontSize(11)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.cleartextAllowed ? '#FFB347' : '#00FF88')
-              }
-              .width('100%')
-
-              Row() {
-                Text('Cleartext (host):')
-                  .fontSize(11)
-                  .fontColor('#8888AA')
-                  .layoutWeight(1)
-                Text(this.hostCleartextAllowed ? 'Allowed' : 'Blocked')
-                  .fontSize(11)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.hostCleartextAllowed ? '#FFB347' : '#00FF88')
-              }
-              .width('100%')
-            }
-            .padding({
-              left: 16,
-              right: 16,
-              top: 8,
-              bottom: 8
-            })
-          }
-
-          ArcListItem() {
-            Button('Refresh')
-              .fontSize(12)
-              .height(32)
-              .width('80%')
-              .backgroundColor('#2A2A4E')
-              .fontColor('#00D4FF')
-              .onClick(() => {
-                this.loadCleartextPolicy();
-                this.checkTlsConnectivity();
+              .padding({
+                left: 16,
+                right: 16,
+                top: 10,
+                bottom: 8
               })
-              .margin({ top: 4, bottom: 8 })
+            }
+
+            ArcListItem() {
+              Column({ space: 4 }) {
+                Row() {
+                  Text('Cleartext (all):')
+                    .fontSize(11)
+                    .fontColor('#8888AA')
+                    .layoutWeight(1)
+                  Text(this.cleartextAllowed ? 'Allowed' : 'Blocked')
+                    .fontSize(11)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(this.cleartextAllowed ? '#FFB347' : '#00FF88')
+                }
+                .width('100%')
+
+                Row() {
+                  Text('Cleartext (host):')
+                    .fontSize(11)
+                    .fontColor('#8888AA')
+                    .layoutWeight(1)
+                  Text(this.hostCleartextAllowed ? 'Allowed' : 'Blocked')
+                    .fontSize(11)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(this.hostCleartextAllowed ? '#FFB347' : '#00FF88')
+                }
+                .width('100%')
+              }
+              .padding({
+                left: 16,
+                right: 16,
+                top: 8,
+                bottom: 8
+              })
+            }
+
+            ArcListItem() {
+              Button('Refresh')
+                .fontSize(12)
+                .height(32)
+                .width('80%')
+                .backgroundColor('#2A2A4E')
+                .fontColor('#00D4FF')
+                .onClick(() => {
+                  this.loadCleartextPolicy();
+                  this.checkTlsConnectivity();
+                })
+                .margin({ top: 4, bottom: 8 })
+            }
           }
         }
         .width('100%')

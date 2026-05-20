@@ -110,7 +110,7 @@ class NetworkMonitorService {
         if (rxBytes > 0 || txBytes > 0) {
           results.push({
             uid,
-            appName: 'UID ' + uid.toString(),
+            appName: `UID ${uid}`,
             txBytes,
             rxBytes,
             totalBytes: txBytes + rxBytes

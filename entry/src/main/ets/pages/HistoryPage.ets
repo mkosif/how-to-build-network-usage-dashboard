@@ -81,36 +81,38 @@ export struct HistoryPage {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList() {
-          LazyForEach(this.historySource, (record: DailyUsageSummary) => {
-            ArcListItem() {
-              Column({ space: 3 }) {
-                Row() {
-                  Text(record.date)
-                    .fontSize(11)
-                    .fontColor('#8888AA')
-                    .layoutWeight(1)
-                  Text(bytesToMB(record.totalBytes).toFixed(1) + ' MB')
-                    .fontSize(12)
-                    .fontColor('#E8E8F0')
-                    .fontWeight(FontWeight.Medium)
-                }
-                .width('100%')
+        Column() {
+          ArcList() {
+            LazyForEach(this.historySource, (record: DailyUsageSummary) => {
+              ArcListItem() {
+                Column({ space: 3 }) {
+                  Row() {
+                    Text(record.date)
+                      .fontSize(11)
+                      .fontColor('#8888AA')
+                      .layoutWeight(1)
+                    Text(`${bytesToMB(record.totalBytes).toFixed(1)} MB`)
+                      .fontSize(12)
+                      .fontColor('#E8E8F0')
+                      .fontWeight(FontWeight.Medium)
+                  }
+                  .width('100%')
 
-                Row() {
-                  Rect()
-                    .width((record.totalBytes / this.maxBytes()) * 100 + '%')
-                    .height(6)
-                    .fill('#00D4FF')
-                    .borderRadius(3)
+                  Row() {
+                    Rect()
+                      .width(`${(record.totalBytes / this.maxBytes()) * 100}%`)
+                      .height(6)
+                      .fill('#00D4FF')
+                      .borderRadius(3)
+                  }
+                  .width('100%')
+                  .backgroundColor('#2A2A4E')
+                  .borderRadius(3)
                 }
-                .width('100%')
-                .backgroundColor('#2A2A4E')
-                .borderRadius(3)
+                .padding({ left: 12, right: 12, top: 6, bottom: 6 })
               }
-              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-            }
-          }, (record: DailyUsageSummary) => record.date)
+            }, (record: DailyUsageSummary) => record.date)
+          }
         }
         .width('100%')
         .layoutWeight(1)

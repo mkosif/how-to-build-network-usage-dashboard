@@ -111,12 +111,12 @@ export struct DashboardPage {
             Row({ space: 8 }) {
               MetricTileComponent({
                 label: 'Wi-Fi',
-                value: this.wifiMB().toFixed(1) + ' MB',
+                value: `${this.wifiMB().toFixed(1)} MB`,
                 accentColor: '#00D4FF'
               })
               MetricTileComponent({
                 label: 'Mobile',
-                value: this.mobileMB().toFixed(1) + ' MB',
+                value: `${this.mobileMB().toFixed(1)} MB`,
                 accentColor: '#FF6B6B'
               })
             }
@@ -160,7 +160,7 @@ export struct DashboardPage {
             .width('100%')
             .justifyContent(FlexAlign.Center)
 
-            Text('Updated: ' + formattedTime(this.snapshot.capturedAt))
+            Text(`Updated: ${formattedTime(this.snapshot.capturedAt)}`)
               .fontSize(10)
               .fontColor('#8888AA')
               .textAlign(TextAlign.Center)

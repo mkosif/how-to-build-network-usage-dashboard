@@ -1,9 +1,7 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { connection } from '@kit.NetworkKit';
-import { policy } from '@kit.NetworkKit';
 import { ArcList, ArcListItem, ComponentContent } from '@kit.ArkUI';
 import { BasicDataSource } from '../utils/BasicDataSource';
-import { deviceInfo } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x0002;
 const TAG = 'PolicyPage';
@@ -123,13 +121,6 @@ export struct PolicyPage {
       });
   }
 
-  private openNetworkSettings(): void {
-    policy.showAppNetPolicySettings(this.context.getHostContext())
-      .catch((err: Error) => {
-        hilog.info(DOMAIN, TAG, 'showAppNetPolicySettings: %{public}s', JSON.stringify(err));
-      });
-  }
-
   build() {
     Column({ space: 0 }) {
       if (this.isLoading) {
@@ -165,56 +156,45 @@ export struct PolicyPage {
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       } else {
-        ArcList({ header: this.header }) {
-          LazyForEach(this.capSource, (entry: NetworkCapEntry) => {
-            ArcListItem() {
-              Row() {
-                Text(entry.label)
-                  .fontSize(11)
-                  .fontColor('#8888AA')
-                  .textAlign(TextAlign.Start)
-                Text(entry.value)
-                  .fontSize(12)
-                  .textAlign(TextAlign.End)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(entry.highlight ? '#FF6B6B' : '#E8E8F0')
+        Column() {
+          ArcList({ header: this.header }) {
+            LazyForEach(this.capSource, (entry: NetworkCapEntry) => {
+              ArcListItem() {
+                Row() {
+                  Text(entry.label)
+                    .fontSize(11)
+                    .fontColor('#8888AA')
+                    .textAlign(TextAlign.Start)
+                  Text(entry.value)
+                    .fontSize(12)
+                    .textAlign(TextAlign.End)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(entry.highlight ? '#FF6B6B' : '#E8E8F0')
+                }
+                .width('100%')
+                .alignItems(VerticalAlign.Center)
+                .justifyContent(FlexAlign.SpaceEvenly)
+                .padding({
+                  left: 16,
+                  right: 16,
+                  top: 8,
+                  bottom: 8
+                })
               }
-              .width('100%')
-              .alignItems(VerticalAlign.Center)
-              .justifyContent(FlexAlign.SpaceEvenly)
-              .padding({
-                left: 16,
-                right: 16,
-                top: 8,
-                bottom: 8
-              })
+            }, (entry: NetworkCapEntry) => entry.label)
+
+            ArcListItem() {
+              Button('Refresh')
+                .fontSize(11)
+                .height(32)
+                .width('80%')
+                .backgroundColor('#2A2A4E')
+                .fontColor('#8888AA')
+                .onClick(() => {
+                  this.loadNetworkPolicy();
+                })
+                .margin({ bottom: 8 })
             }
-          }, (entry: NetworkCapEntry) => entry.label)
-
-          ArcListItem() {
-            Button('Network Settings')
-              .fontSize(11)
-              .height(32)
-              .width('80%')
-              .backgroundColor('#2A2A4E')
-              .fontColor('#00D4FF')
-              .onClick(() => {
-                this.openNetworkSettings();
-              })
-              .margin({ top: 4, bottom: 4 })
-          }
-
-          ArcListItem() {
-            Button('Refresh')
-              .fontSize(11)
-              .height(32)
-              .width('80%')
-              .backgroundColor('#2A2A4E')
-              .fontColor('#8888AA')
-              .onClick(() => {
-                this.loadNetworkPolicy();
-              })
-              .margin({ bottom: 8 })
           }
         }
         .width('100%')
