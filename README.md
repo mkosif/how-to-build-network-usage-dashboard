@@ -1,20 +1,21 @@
 # How To Build Network Usage Dashboard
 
 **How To Build Network Usage Dashboard** is a HarmonyOS wearable codelab that demonstrates practical network awareness
-on standalone cellular watches. It checks traffic counters when the system grants `GET_NETWORK_STATS`, shows the current
-connection bearer and metered status, applies an app-level usage threshold with local alert notifications, verifies PEM
-certificate trust against the device trust store, and discovers nearby local services over mDNS.
+on standalone cellular watches. It shows the current connection bearer and metered status, verifies PEM certificate
+trust against the device trust store, discovers nearby local services over mDNS, and gracefully reports whether platform
+traffic counters are available.
 
 # Use Cases
 
-- **Traffic counter check:** Read interface counters via `statistics.getIfaceRxBytes` and
-  `statistics.getIfaceTxBytes`. If interface names are unavailable, the app tries `statistics.getAllRxBytes`,
+- **Traffic counter check:** The app attempts to read traffic counters via `statistics.getIfaceRxBytes` and
+  `statistics.getIfaceTxBytes`. If interface names are unavailable, it tries `statistics.getAllRxBytes`,
   `statistics.getAllTxBytes`, `statistics.getUidRxBytes`, and `statistics.getUidTxBytes` for the current app UID.
+  These counters may be unavailable to normal debug builds, so the UI includes a fallback state.
 - **Connection awareness:** Show the active bearer, metered status, internet capability, and bandwidth hints using
   `connection.isDefaultNetMetered`, `connection.getDefaultNet`, and `connection.getNetCapabilities`.
-- **App-level usage threshold:** Set a usage limit in MB; the app fires a local notification when the observed interface
-  traffic reaches the threshold using `notificationManager.publish`. The limit and notification preference are persisted
-  in device storage via `@kit.ArkData`.
+- **App-level usage threshold:** Set a usage limit in MB; when traffic counters are available, the app fires a local
+  notification as the observed traffic reaches the threshold using `notificationManager.publish`. The limit and
+  notification preference are persisted in device storage via `@kit.ArkData`.
 - **Certificate trust verification:** Verify a PEM certificate against the device trust store using
   `networkSecurity.certVerification` and inspect per-host cleartext-traffic permissions with
   `networkSecurity.isCleartextPermitted`.
@@ -43,15 +44,16 @@ certificate trust against the device trust store, and discovers nearby local ser
   > Required by `networkSecurity.isCleartextPermitted` and `isCleartextPermittedByHostName` to inspect
   > cleartext-traffic policy.
 
-- `ohos.permission.GET_NETWORK_STATS`
-  > Required to read traffic counters via the `statistics` module. This is a system-basic permission, so unsigned builds
-  > may receive permission errors on some devices.
-
 ## Scope
 
 This codelab does not set system-level cellular quotas or block network access for other apps. HarmonyOS quota APIs are
 not exposed through the public `@ohos.net.policy` SDK surface used by this project. The sample therefore demonstrates
 network awareness and local alerts, not system quota enforcement.
+
+Traffic counter APIs in `@ohos.net.statistics` may require system-level privileges on some devices. The sample does not
+request `ohos.permission.GET_NETWORK_STATS` in `module.json5`, because that permission can prevent normal debug builds
+from running on some simulators. If the platform denies traffic counter access, the dashboard shows an unavailable state
+while the connection, certificate, and mDNS features continue to run.
 
 # Directory Structure
 
