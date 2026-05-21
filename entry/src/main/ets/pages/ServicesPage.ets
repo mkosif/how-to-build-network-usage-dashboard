@@ -41,11 +41,11 @@ export struct ServicesPage {
   private startDiscovery(): void {
     this.isDiscovering = true;
     this.hasError = false;
-    this.discoveryInstances = [];
-
+    const ctx = this.context as common.UIAbilityContext;
+    const instances: mdns.DiscoveryService[] = [];
+    let discoveryError = false;
     for (const serviceType of SERVICE_TYPES) {
       try {
-        const ctx = this.context as common.UIAbilityContext;
         const ds: mdns.DiscoveryService = mdns.createDiscoveryService(ctx, serviceType);
 
         ds.on('serviceFound', (info: mdns.LocalServiceInfo) => {
@@ -59,14 +59,18 @@ export struct ServicesPage {
         });
 
         ds.startSearchingMDNS();
-        this.discoveryInstances.push(ds);
+        instances.push(ds);
         hilog.info(DOMAIN, TAG, 'Discovery started for %{public}s', serviceType);
       } catch (err) {
         hilog.error(DOMAIN, TAG, 'Failed to start discovery for %{public}s: %{public}s',
           serviceType, JSON.stringify(err));
-        this.hasError = true;
-        this.errorMsg = 'mDNS discovery unavailable';
+        discoveryError = true;
       }
+    }
+    this.discoveryInstances = instances;
+    if (discoveryError) {
+      this.hasError = true;
+      this.errorMsg = 'mDNS discovery unavailable';
     }
   }
 
