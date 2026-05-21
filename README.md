@@ -5,6 +5,14 @@ on standalone cellular watches. It shows the current connection bearer and meter
 trust against the device trust store, discovers nearby local services over mDNS, and gracefully reports whether platform
 traffic counters are available.
 
+# Preview
+
+<div align="center">
+  <img src="./screenshots/preview_1.png" width="25%" alt="Dashboard preview" />
+  <img src="./screenshots/preview_2.png" width="25%" alt="Connection preview" />
+  <img src="./screenshots/preview_3.png" width="25%" alt="History preview" />
+</div>
+
 # Use Cases
 
 - **Traffic counter check:** The app attempts to read traffic counters via `statistics.getIfaceRxBytes` and
