@@ -59,7 +59,7 @@ export struct DetailPage {
             .textAlign(TextAlign.Center)
             .padding({ left: 16, right: 16 })
           if (this.hasError) {
-            Text('Platform counter access denied')
+            Text('Counters unavailable here')
               .fontSize(10)
               .fontColor('#555577')
               .textAlign(TextAlign.Center)

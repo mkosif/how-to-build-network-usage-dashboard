@@ -95,7 +95,7 @@ export struct DashboardScreen {
                     .fontColor('#FFB347')
                     .textAlign(TextAlign.Center)
                     .width('100%')
-                  Text('Permission or emulator limit')
+                  Text('Device or emulator limit')
                     .fontSize(9)
                     .fontColor('#555577')
                     .textAlign(TextAlign.Center)

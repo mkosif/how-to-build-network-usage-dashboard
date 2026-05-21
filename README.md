@@ -50,10 +50,11 @@ This codelab does not set system-level cellular quotas or block network access f
 not exposed through the public `@ohos.net.policy` SDK surface used by this project. The sample therefore demonstrates
 network awareness and local alerts, not system quota enforcement.
 
-Traffic counter APIs in `@ohos.net.statistics` may require system-level privileges on some devices. The sample does not
-request `ohos.permission.GET_NETWORK_STATS` in `module.json5`, because that permission can prevent normal debug builds
-from running on some simulators. If the platform denies traffic counter access, the dashboard shows an unavailable state
-while the connection, certificate, and mDNS features continue to run.
+This sample uses realtime counter APIs such as `getIfaceRxBytes`, `getIfaceTxBytes`, `getAllRxBytes`, and
+`getUidRxBytes`. It does not request `ohos.permission.GET_NETWORK_STATS`, because that system-level permission is for
+restricted traffic statistics APIs such as historical per-interface and per-UID queries. Adding it to a normal debug
+build can prevent the app from running on some simulators. If the simulator or device does not expose the realtime
+counters, the dashboard shows an unavailable state while the connection, certificate, and mDNS features continue to run.
 
 # Directory Structure
 
