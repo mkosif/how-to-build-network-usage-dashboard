@@ -8,9 +8,10 @@ traffic counters are available.
 # Preview
 
 <div align="center">
-  <img src="./screenshots/preview_1.png" width="25%" alt="Dashboard preview" />
-  <img src="./screenshots/preview_2.png" width="25%" alt="Connection preview" />
-  <img src="./screenshots/preview_3.png" width="25%" alt="History preview" />
+  <img src="./screenshots/1.png" width="24%" alt="Dashboard preview" />
+  <img src="./screenshots/2.png" width="24%" alt="Connection preview" />
+  <img src="./screenshots/3.png" width="24%" alt="History preview" />
+  <img src="./screenshots/4.png" width="24%" alt="History preview" />
 </div>
 
 # Use Cases
