@@ -8,7 +8,7 @@ import { bytesToMB, isWifi, formattedTime } from '../utils/NetworkUtils';
 import { ArcList, ArcListItem, ComponentContent } from '@kit.ArkUI';
 
 @Builder
-function HeaderBuilder() {
+function headerBuilder() {
   Text($r('app.string.dashboard_title'))
     .fontSize(14)
     .fontWeight(FontWeight.Bold)
@@ -24,7 +24,7 @@ export struct DashboardScreen {
   @StorageProp('netSnapshotError') hasError: boolean = false;
   @State settings: SettingsModel = new SettingsModel();
   private context: UIContext = this.getUIContext();
-  private header: ComponentContent<Object> = new ComponentContent(this.context, wrapBuilder(HeaderBuilder))
+  private header: ComponentContent<Object> = new ComponentContent(this.context, wrapBuilder(headerBuilder))
 
   aboutToAppear(): void {
     storageService.getSettings().then((s: SettingsModel) => {

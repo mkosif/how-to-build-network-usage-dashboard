@@ -42,7 +42,7 @@ NaGPTvqEbOAqI2bCKaX8HNn7DVN3HGxnqKG7j5Wbm8fFiSk7mA==
 -----END CERTIFICATE-----`;
 
 @Builder
-function HeaderBuilder() {
+function headerBuilder() {
   Column({ space: 0 }) {
     Text('Certificate Check')
       .fontSize(14)
@@ -70,7 +70,7 @@ export struct SecurityPage {
   @State cleartextAllowed: boolean = false;
   @State hostCleartextAllowed: boolean = false;
   private context: UIContext = this.getUIContext();
-  private header: ComponentContent<Object> = new ComponentContent(this.context, wrapBuilder(HeaderBuilder));
+  private header: ComponentContent<Object> = new ComponentContent(this.context, wrapBuilder(headerBuilder));
 
   aboutToAppear(): void {
     this.loadCleartextPolicy();
